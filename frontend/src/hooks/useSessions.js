@@ -10,6 +10,8 @@ export const useCreateSession = () => {
     onError: (error) => toast.error(error.response?.data?.message || "Failed to create room"),
   });
 
+  console.log(result)
+
   return result;
 };
 
