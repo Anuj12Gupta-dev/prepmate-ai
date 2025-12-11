@@ -1,6 +1,6 @@
-# PrepMate AI - Coding Interview Preparation Platform
+# PeerPrep - Coding Interview Preparation Platform
 
-PrepMate AI is a collaborative coding interview preparation platform that allows users to practice coding problems together in real-time with video chat, code sharing, and execution capabilities.
+PeerPrep is a collaborative coding interview preparation platform that allows users to practice coding problems together in real-time with video chat, code sharing, and execution capabilities.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -15,6 +15,11 @@ PrepMate AI is a collaborative coding interview preparation platform that allows
   - [Running the Application](#running-the-application)
 - [Usage Guide](#usage-guide)
 - [API Endpoints](#api-endpoints)
+- [Database Schema](#database-schema)
+- [Authentication Flow](#authentication-flow)
+- [Real-time Communication](#real-time-communication)
+- [Code Execution](#code-execation)
+- [Deployment](#deployment)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -42,15 +47,16 @@ PrepMate AI is designed to help software engineers prepare for technical intervi
 ## Technology Stack
 
 ### Frontend
-- **React 18+** - JavaScript library for building user interfaces
-- **Vite** - Fast build tool and development server
-- **Tailwind CSS** - Utility-first CSS framework
-- **DaisyUI** - Component library for Tailwind CSS
+- **React 19+** - JavaScript library for building user interfaces
+- **Vite 7+** - Fast build tool and development server
+- **Tailwind CSS 4+** - Utility-first CSS framework
+- **DaisyUI 5+** - Component library for Tailwind CSS
 - **React Router v7** - Declarative routing for React applications
-- **React Query (TanStack Query)** - Data fetching and state management
+- **React Query (TanStack Query) 5+** - Data fetching and state management
 - **Monaco Editor** - Code editor component (same as VS Code)
 - **Stream Chat & Video SDK** - Real-time communication APIs
 - **Clerk** - Authentication and user management
+- **Axios** - HTTP client for API requests
 
 ### Backend
 - **Node.js** - JavaScript runtime environment
@@ -84,21 +90,55 @@ prepmate-ai/
 ├── backend/
 │   ├── src/
 │   │   ├── controllers/     # Request handlers
+│   │   │   ├── chatController.js
+│   │   │   └── sessionController.js
 │   │   ├── lib/             # Utilities and configurations
+│   │   │   ├── db.js
+│   │   │   ├── env.js
+│   │   │   ├── inngest.js
+│   │   │   └── stream.js
 │   │   ├── middleware/      # Custom middleware functions
+│   │   │   └── protectRoute.js
 │   │   ├── models/          # Database models
+│   │   │   ├── Session.js
+│   │   │   └── User.js
 │   │   ├── routes/          # API route definitions
+│   │   │   ├── chatRoutes.js
+│   │   │   └── sessionRoute.js
 │   │   └── server.js        # Main server entry point
 │   ├── .env                 # Backend environment variables
 │   └── package.json         # Backend dependencies
 └── frontend/
     ├── src/
     │   ├── api/             # API service functions
+    │   │   └── sessions.js
     │   ├── components/      # Reusable UI components
+    │   │   ├── ActiveSessions.jsx
+    │   │   ├── CodeEditorPanel.jsx
+    │   │   ├── CreateSessionModal.jsx
+    │   │   ├── Navbar.jsx
+    │   │   ├── OutputPanel.jsx
+    │   │   ├── ProblemDescription.jsx
+    │   │   ├── RecentSessions.jsx
+    │   │   ├── StatsCards.jsx
+    │   │   ├── VideoCallUI.jsx
+    │   │   └── WelcomeSection.jsx
     │   ├── data/            # Static data files
+    │   │   └── problems.js
     │   ├── hooks/           # Custom React hooks
+    │   │   ├── useSessions.js
+    │   │   └── useStreamClient.js
     │   ├── lib/             # Utility functions
+    │   │   ├── axios.js
+    │   │   ├── piston.js
+    │   │   ├── stream.js
+    │   │   └── utils.js
     │   ├── pages/           # Page components
+    │   │   ├── DashboardPage.jsx
+    │   │   ├── HomePage.jsx
+    │   │   ├── ProblemPage.jsx
+    │   │   ├── ProblemsPage.jsx
+    │   │   └── SessionPage.jsx
     │   ├── App.jsx          # Main App component
     │   └── main.jsx         # React DOM renderer
     ├── .env                 # Frontend environment variables
@@ -110,7 +150,7 @@ prepmate-ai/
 ### Prerequisites
 
 Before you begin, ensure you have the following installed:
-- Node.js (v16 or higher)
+- Node.js (v18 or higher)
 - npm or yarn package manager
 - MongoDB database (local or cloud instance)
 - Accounts for third-party services:
@@ -145,7 +185,7 @@ Create a `.env` file in the `backend/` directory with the following variables:
 PORT=5000
 NODE_ENV=development
 CLIENT_URL=http://localhost:5173
-MONGO_URI=your_mongodb_connection_string
+MONGO_URL=your_mongodb_connection_string
 CLERK_SECRET_KEY=your_clerk_secret_key
 STREAM_API_KEY=your_stream_api_key
 STREAM_API_SECRET=your_stream_api_secret
@@ -218,12 +258,84 @@ npm run dev
 - `POST /api/sessions/:id/join` - Join a session
 - `POST /api/sessions/:id/end` - End a session
 
+### Chat
+- `GET /api/chat/token` - Get Stream Chat token
+
 ### Health Check
-- `GET /test` - Check if the API is running
+- `GET /` - Check if the API is running
+
+## Database Schema
+
+### User Model
+```javascript
+{
+  name: String,          // Required
+  email: String,         // Required, Unique
+  profileImage: String,  // Optional
+  clerkId: String        // Required, Unique
+}
+```
+
+### Session Model
+```javascript
+{
+  problem: String,               // Required
+  difficulty: String,            // Enum: ["easy", "medium", "hard"]
+  host: ObjectId (ref: User),    // Required
+  participant: ObjectId (ref: User), // Optional
+  status: String,                // Enum: ["active", "completed"], Default: "active"
+  callId: String                 // Stream video call ID
+}
+```
+
+## Authentication Flow
+
+PeerPrep uses Clerk for authentication:
+1. Users sign up/log in through Clerk's authentication system
+2. Clerk provides a JWT token to the frontend
+3. The frontend includes this token in the Authorization header for all API requests
+4. The backend verifies the token using Clerk's verification middleware
+5. If valid, the request proceeds; otherwise, a 401 Unauthorized response is sent
+
+## Real-time Communication
+
+The platform uses Stream's Chat and Video SDKs for real-time communication:
+- **Video Calls**: Implemented using Stream Video SDK for peer-to-peer video communication
+- **Text Chat**: Implemented using Stream Chat SDK for messaging within sessions
+- **Session Synchronization**: Real-time updates for session status and participant information
+
+## Code Execution
+
+The platform supports code execution through integration with the Piston API:
+- Multiple programming languages supported
+- Secure code execution in isolated environments
+- Real-time output streaming
+- Error handling and timeout management
+
+## Deployment
+
+### Backend Deployment
+1. Set up a MongoDB database (MongoDB Atlas recommended)
+2. Deploy the Express server to a cloud provider (Vercel, Render, Heroku, etc.)
+3. Configure environment variables in your deployment platform
+
+### Frontend Deployment
+1. Build the production version:
+```bash
+cd frontend
+npm run build
+```
+2. Deploy the contents of the `dist/` folder to a static hosting service (Vercel, Netlify, etc.)
+
+### Environment Configuration for Production
+Ensure all environment variables are properly configured in your production environment, especially:
+- `CLIENT_URL` should point to your frontend URL
+- `MONGO_URI` should point to your production MongoDB instance
+- All Clerk and Stream API keys should be production keys
 
 ## Contributing
 
-We welcome contributions to PrepMate AI! Here's how you can help:
+We welcome contributions to PeerPrep! Here's how you can help:
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
@@ -238,5 +350,3 @@ Please ensure your code follows the existing style and includes appropriate test
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-
-*PrepMate AI - Practice makes perfect, especially with the right partner!*
