@@ -1,21 +1,20 @@
 import axios from "axios";
-import { getClerk } from "@clerk/clerk-react";
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
-// attach token to every request
+// Add Authorization Bearer token to every request
 axiosInstance.interceptors.request.use(async (config) => {
-  const clerk = getClerk();
+  // Clerk v5 exposes the client globally in the browser
+  const clerk = window.Clerk;
 
-  // Clerk may not be loaded instantly
-  if (!clerk || !clerk.session) return config;
+  if (clerk && clerk.session) {
+    const token = await clerk.session.getToken();
 
-  const token = await clerk.session.getToken();
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
 
   return config;

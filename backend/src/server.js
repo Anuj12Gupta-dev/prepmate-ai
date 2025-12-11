@@ -14,21 +14,19 @@ const app = express();
 
 const __dirname = path.resolve();
 
-// middleware
+// Middleware
 app.use(express.json());
 
-// NO COOKIE-BASED AUTH → credentials: false
 app.use(
   cors({
-    origin: ENV.CLIENT_URL,  // your Vercel frontend domain
-    credentials: false,      // IMPORTANT: no cookies anymore
+    origin: ENV.CLIENT_URL,  // your Vercel domain
+    credentials: false,       // IMPORTANT → no cookies anymore
   })
 );
 
-// ❌ REMOVE THIS — it's blocking your new token auth
+// REMOVE THIS — cookie-based auth
 // app.use(clerkMiddleware());
 
-// normal routes
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/chat", chatRoutes);
 app.use("/api/sessions", sessionRoutes);
@@ -40,9 +38,9 @@ app.get("/", (req, res) => {
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(ENV.PORT, () => console.log("Server is running on port:", ENV.PORT));
+    app.listen(ENV.PORT, () => console.log("Server running:", ENV.PORT));
   } catch (error) {
-    console.error("💥 Error starting the server", error);
+    console.error("Error starting the server", error);
   }
 };
 
