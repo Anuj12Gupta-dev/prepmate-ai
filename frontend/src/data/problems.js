@@ -339,6 +339,167 @@ print(maxArea([1,1]))  # Expected: 1`,
       java: "49\n1",
     },
   },
+  "best-time-to-buy-and-sell-stock": {
+    id: "best-time-to-buy-and-sell-stock",
+    title: "Best Time to Buy and Sell Stock",
+    difficulty: "Easy",
+    category: "Array • Greedy",
+    description: {
+      text: "You are given an array prices where prices[i] is the price of a given stock on the ith day.",
+      notes: [
+        "You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.",
+      ],
+    },
+    examples: [
+      {
+        input: "prices = [7,1,5,3,6,4]",
+        output: "5",
+        explanation: "Buy on day 2 (price=1) and sell on day 5 (price=6).",
+      },
+      {
+        input: "prices = [7,6,4,3,1]",
+        output: "0",
+      },
+    ],
+    constraints: [
+      "1 ≤ prices.length ≤ 10⁵",
+      "0 ≤ prices[i] ≤ 10⁴",
+    ],
+    starterCode: {
+      javascript: `function maxProfit(prices) {
+  // Write your solution here
+}`,
+      python: `def maxProfit(prices):
+    pass`,
+      java: `class Solution {
+  public static int maxProfit(int[] prices) {
+    return 0;
+  }
+}`,
+    },
+    expectedOutput: {
+      javascript: "5\n0",
+      python: "5\n0",
+      java: "5\n0",
+    },
+  },
+
+  "contains-duplicate": {
+    id: "contains-duplicate",
+    title: "Contains Duplicate",
+    difficulty: "Easy",
+    category: "Array • Hash Table",
+    description: {
+      text: "Given an integer array nums, return true if any value appears at least twice.",
+      notes: [],
+    },
+    examples: [
+      { input: "nums = [1,2,3,1]", output: "true" },
+      { input: "nums = [1,2,3,4]", output: "false" },
+    ],
+    constraints: [
+      "1 ≤ nums.length ≤ 10⁵",
+      "-10⁹ ≤ nums[i] ≤ 10⁹",
+    ],
+    starterCode: {
+      javascript: `function containsDuplicate(nums) {}`,
+      python: `def containsDuplicate(nums): pass`,
+      java: `class Solution { static boolean containsDuplicate(int[] nums){ return false; } }`,
+    },
+    expectedOutput: {
+      javascript: "true\nfalse",
+      python: "True\nFalse",
+      java: "true\nfalse",
+    },
+  },
+
+  "merge-sorted-array": {
+    id: "merge-sorted-array",
+    title: "Merge Sorted Array",
+    difficulty: "Easy",
+    category: "Array • Two Pointers",
+    description: {
+      text: "Merge nums2 into nums1 as one sorted array.",
+      notes: ["nums1 has enough space to hold nums2"],
+    },
+    examples: [
+      {
+        input: "nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3",
+        output: "[1,2,2,3,5,6]",
+      },
+    ],
+    constraints: [
+      "nums1.length == m + n",
+      "nums2.length == n",
+    ],
+    starterCode: {
+      javascript: `function merge(nums1, m, nums2, n) {}`,
+      python: `def merge(nums1, m, nums2, n): pass`,
+      java: `class Solution { static void merge(int[] nums1,int m,int[] nums2,int n){} }`,
+    },
+    expectedOutput: {
+      javascript: "[1,2,2,3,5,6]",
+      python: "[1, 2, 2, 3, 5, 6]",
+      java: "[1, 2, 2, 3, 5, 6]",
+    },
+  },
+
+  "move-zeroes": {
+    id: "move-zeroes",
+    title: "Move Zeroes",
+    difficulty: "Easy",
+    category: "Array • Two Pointers",
+    description: {
+      text: "Move all 0's to the end while maintaining relative order.",
+      notes: ["Do this in-place."],
+    },
+    examples: [
+      {
+        input: "nums = [0,1,0,3,12]",
+        output: "[1,3,12,0,0]",
+      },
+    ],
+    constraints: [
+      "1 ≤ nums.length ≤ 10⁴",
+      "-10³ ≤ nums[i] ≤ 10³",
+    ],
+    starterCode: {
+      javascript: `function moveZeroes(nums) {}`,
+      python: `def moveZeroes(nums): pass`,
+      java: `class Solution { static void moveZeroes(int[] nums){} }`,
+    },
+    expectedOutput: {
+      javascript: "[1,3,12,0,0]",
+      python: "[1, 3, 12, 0, 0]",
+      java: "[1, 3, 12, 0, 0]",
+    },
+  },
+
+  "single-number": {
+    id: "single-number",
+    title: "Single Number",
+    difficulty: "Easy",
+    category: "Bit Manipulation",
+    description: {
+      text: "Find the element that appears only once.",
+      notes: ["Every other element appears twice."],
+    },
+    examples: [
+      { input: "nums = [2,2,1]", output: "1" },
+      { input: "nums = [4,1,2,1,2]", output: "4" },
+    ],
+    constraints: ["1 ≤ nums.length ≤ 3*10⁴"],
+    starterCode: {
+      javascript: `function singleNumber(nums) {}`,
+      python: `def singleNumber(nums): pass`,
+      java: `class Solution { static int singleNumber(int[] nums){ return 0; } }`,
+    },
+    expectedOutput: {
+      javascript: "1\n4",
+      python: "1\n4",
+      java: "1\n4",
+    },
+  },
 };
 
 export const LANGUAGE_CONFIG = {
