@@ -1,7 +1,4 @@
 function OutputPanel({ output, testCases, selectedTestCase, onSelectTestCase, testCaseResults, expectedOutput , success }) {
-  console.log("first"+output)
-  console.log(testCaseResults)
-  console.log(testCases)
   return (
     // Main Container: Dark background, column layout
     <div className="h-full bg-slate-900 flex flex-col rounded-b-xl border border-t-0 border-white/5">

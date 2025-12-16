@@ -16,6 +16,7 @@ import useStreamClient from "../hooks/useStreamClient";
 import { StreamCall, StreamVideo } from "@stream-io/video-react-sdk";
 import VideoCallUI from "../components/VideoCallUI";
 import toast from "react-hot-toast";
+import confetti from "canvas-confetti";
 
 function SessionPage() {
   const navigate = useNavigate();
@@ -27,6 +28,11 @@ function SessionPage() {
   const [selectedTestCase, setSelectedTestCase] = useState(0);
   const [testCaseResults, setTestCaseResults] = useState({});
   const [success, setSuccess] = useState(false);
+
+  const triggerConfetti = useCallback(() => {
+    confetti({ particleCount: 80, spread: 250, origin: { x: 0.2, y: 0.6 } });
+    confetti({ particleCount: 80, spread: 250, origin: { x: 0.8, y: 0.6 } });
+  }, []);
 
   // Data fetching and Mutations
   const { data: sessionData, isLoading: loadingSession, refetch } = useSessionById(id);
@@ -122,11 +128,9 @@ function SessionPage() {
           }
           `;
     }
-    console.log(completedCode)
 
     try {
       const result = await executeCode(selectedLanguage, completedCode);
-      console.log(result)
       setOutput(result.output);
       setIsRunning(false);
       setSuccess(result.success);
@@ -155,6 +159,7 @@ function SessionPage() {
       setTestCaseResults(results);
 
       if (allPassed) {
+        triggerConfetti();
         toast.success("All test cases passed!");
       } else {
         toast.error("Some test cases failed");

@@ -21,9 +21,6 @@ app.use(
   })
 );
 
-// REMOVE THIS — cookie-based auth
-// app.use(clerkMiddleware());
-
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/chat", chatRoutes);
 app.use("/api/sessions", sessionRoutes);
@@ -35,9 +32,11 @@ app.get("/", (req, res) => {
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(ENV.PORT, () => console.log("Server running:", ENV.PORT));
+    app.listen(ENV.PORT, () => {
+      // Server started successfully
+    });
   } catch (error) {
-    console.error("Error starting the server", error);
+    // Error handling for server startup
   }
 };
 

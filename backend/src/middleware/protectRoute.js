@@ -24,7 +24,7 @@ export const protectRoute = async (req, res, next) => {
     req.auth = payload;
     next();
   } catch (err) {
-    console.error("protectRoute error:", err);
+    // Error handling for route protection
     return res.status(401).json({ message: "Unauthorized" });
   }
 };

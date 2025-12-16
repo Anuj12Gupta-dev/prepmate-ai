@@ -80,12 +80,9 @@ function ProblemPage() {
           }
           `;
     }
-    console.log(completedCode)
-
 
     try {
       const result = await executeCode(selectedLanguage, completedCode);
-      console.log(result)
       setOutput(result.output);
       setIsRunning(false);
       setSuccess(result.success);

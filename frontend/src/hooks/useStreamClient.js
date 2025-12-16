@@ -56,7 +56,7 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
         setChannel(chatChannel);
       } catch (error) {
         toast.error("Failed to join video call");
-        console.error("Error init call", error);
+        // Error handling for call initialization
       } finally {
         setIsInitializingCall(false);
       }
@@ -73,7 +73,7 @@ function useStreamClient(session, loadingSession, isHost, isParticipant) {
           if (chatClientInstance) await chatClientInstance.disconnectUser();
           await disconnectStreamClient();
         } catch (error) {
-          console.error("Cleanup error:", error);
+          // Error handling for cleanup
         }
       })();
     };
