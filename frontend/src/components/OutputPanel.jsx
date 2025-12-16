@@ -1,4 +1,6 @@
-function OutputPanel({ output, testCases, selectedTestCase, onSelectTestCase, testCaseResults, expectedOutput }) {
+function OutputPanel({ output, testCases, selectedTestCase, onSelectTestCase, testCaseResults, expectedOutput , success }) {
+  console.log("first"+output)
+  console.log(success)
   return (
     // Main Container: Dark background, column layout
     <div className="h-full bg-slate-900 flex flex-col rounded-b-xl border border-t-0 border-white/5">
@@ -70,10 +72,18 @@ function OutputPanel({ output, testCases, selectedTestCase, onSelectTestCase, te
         )}
         
         {/* Show general output messages - only when output is available (after running code) */}
+        {
+          success === false ? (
+           <pre className="text-red-400 whitespace-pre-wrap">
+              {output} 
+          </pre> 
+           ) : null
+        }
+
         {output && output.success ? (
           // Success State (Green Text) - Only show the actual output from piston API
-          <pre className="text-green-400 whitespace-pre-wrap">
-              All test case passed 
+          <pre className="text-green-400 whitespace-pre-wrap">  
+              All test cases passed 
           </pre>
         ) : output && !output.success ? (
           // Error State - Only show the error from piston API

@@ -16,7 +16,6 @@ function ProblemPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Initialize with a default problem ID if the URL is empty or invalid
   const defaultProblemId = Object.keys(PROBLEMS)[0] || "two-sum";
   const initialProblemId = id && PROBLEMS[id] ? id : defaultProblemId;
 
@@ -25,139 +24,110 @@ function ProblemPage() {
   const [code, setCode] = useState(PROBLEMS[initialProblemId].starterCode.javascript);
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
-  const [selectedTestCase, setSelectedTestCase] = useState(0); // Default to first test case
-  const [testCaseResults, setTestCaseResults] = useState({}); // Store results for each test case
+  const [selectedTestCase, setSelectedTestCase] = useState(0);
+  const [testCaseResults, setTestCaseResults] = useState({});
+  const [success, setSuccess] = useState(false);
 
-  // Derive current problem object
   const currentProblem = PROBLEMS[currentProblemId];
 
-  // Effect to update state when URL param changes
   useEffect(() => {
     if (id && PROBLEMS[id] && id !== currentProblemId) {
       setCurrentProblemId(id);
-      // Reset code to new problem's starter code for the currently selected language
-      setCode(PROBLEMS[id].starterCode[selectedLanguage] || PROBLEMS[id].starterCode.javascript);
-      setOutput(null); // Clear previous output
+      setCode(PROBLEMS[id].starterCode[selectedLanguage]);
+      setOutput(null);
     }
   }, [id, currentProblemId, selectedLanguage]);
 
-  // Handler for changing the programming language
   const handleLanguageChange = (e) => {
-    const newLang = e.target.value;
-    setSelectedLanguage(newLang);
-    // Use the current problem's starter code for the new language
-    setCode(currentProblem.starterCode[newLang]);
+    const lang = e.target.value;
+    setSelectedLanguage(lang);
+    setCode(currentProblem.starterCode[lang]);
     setOutput(null);
   };
 
-  // Handler for changing the problem (updates URL)
-  const handleProblemChange = (newProblemId) => navigate(`/problem/${newProblemId}`);
+  const handleProblemChange = (pid) => navigate(`/problem/${pid}`);
 
-  // Confetti effect helper
   const triggerConfetti = useCallback(() => {
-    confetti({
-      particleCount: 80,
-      spread: 250,
-      origin: { x: 0.2, y: 0.6 },
-    });
-
-    confetti({
-      particleCount: 80,
-      spread: 250,
-      origin: { x: 0.8, y: 0.6 },
-    });
+    confetti({ particleCount: 80, spread: 250, origin: { x: 0.2, y: 0.6 } });
+    confetti({ particleCount: 80, spread: 250, origin: { x: 0.8, y: 0.6 } });
   }, []);
 
-  // Normalize code output for robust comparison
-  const normalizeOutput = useCallback((output) => {
-    if (typeof output !== 'string') return '';
-    return output
-      .trim()
-      .split("\n")
-      .map((line) =>
-        line
-          .trim()
-          .replace(/\[\s+/g, "[")
-          .replace(/\s+\]/g, "]")
-          .replace(/\s*,\s*/g, ",")
-      )
-      .filter((line) => line.length > 0)
-      .join("\n");
+  const normalizeOutput = useCallback((out) => {
+    if (typeof out !== "string") return "";
+    return out.trim().replace(/\s+/g, "");
   }, []);
 
-  // Check if test output matches expected output
-  const checkIfTestsPassed = useCallback((actualOutput, expectedOutput) => {
-    const normalizedActual = normalizeOutput(actualOutput);
-    const normalizedExpected = normalizeOutput(expectedOutput);
-
-    return normalizedActual === normalizedExpected;
-  }, [normalizeOutput]);
-
-  // Handler for running code
   const handleRunCode = async () => {
+    if (!currentProblem) return;
+
     setIsRunning(true);
     setOutput(null);
 
-    // Ensure currentProblem and starterCode exists before executing
-    if (!currentProblem || !currentProblem.starterCode[selectedLanguage]) {
-      toast.error("Invalid problem or language selection.");
-      setIsRunning(false);
-      return;
+    let completedCode = "";
+
+    if (selectedLanguage !== "java") {
+      completedCode =
+        code + "\n" + (currentProblem.testCases?.[selectedLanguage] || "");
+    } else {
+      completedCode = `
+import java.util.*;
+public class Main {
+${code}
+
+${currentProblem.testCases?.java || ""}
+}
+`;
     }
 
-    const result = await executeCode(selectedLanguage, code);
-    setOutput(result);
-    setIsRunning(false);
+    try {
+      const result = await executeCode(selectedLanguage, completedCode);
+      console.log(result)
+      setOutput(result.output);
+      setIsRunning(false);
+      setSuccess(result.success);
 
-    // Process test case results if execution was successful
-    if (result.success && currentProblem.expectedOutput?.[selectedLanguage]) {
-      // Split the expected output by lines
-      const expectedOutputs = currentProblem.expectedOutput[selectedLanguage].split('\n');
-      
-      // Split the actual output by lines
-      const actualOutputs = result.output.split('\n');
-      
-      // Create a copy of current results
-      const updatedResults = { ...testCaseResults };
-      
-      // Process each test case
-      for (let i = 0; i < expectedOutputs.length && i < actualOutputs.length; i++) {
-        const normalizedActual = normalizeOutput(actualOutputs[i]);
-        const normalizedExpected = normalizeOutput(expectedOutputs[i]);
-        
-        updatedResults[i] = {
-          passed: normalizedActual === normalizedExpected,
-          actualOutput: actualOutputs[i].trim(),
-          expectedOutput: expectedOutputs[i].trim()
-        };
+      if (!result.success) {
+        toast.error("Execution failed");
+        return;
       }
-      
-      setTestCaseResults(updatedResults);
-      
-      // Check overall result
-      const allTestsPassed = Object.values(updatedResults).every(result => result.passed);
-      
-      if (allTestsPassed) {
+
+      const expected = currentProblem.expectedOutput?.[selectedLanguage];
+      if (!expected) return;
+
+      const actualLines = result.output.trim().split("\n");
+      const expectedLines = expected.trim().split("\n");
+
+      const results = {};
+      let allPassed = true;
+
+      expectedLines.forEach((exp, i) => {
+        const pass =
+          normalizeOutput(actualLines[i]) === normalizeOutput(exp);
+        results[i] = { passed: pass };
+        if (!pass) allPassed = false;
+      });
+
+      setTestCaseResults(results);
+
+      if (allPassed) {
         triggerConfetti();
-        toast.success("All tests passed! Great job!");
+        toast.success("All test cases passed!");
       } else {
-        toast.error("Some tests failed. Check your output against the examples.");
+        toast.error("Some test cases failed");
       }
-    } else if (!result.success) {
-      toast.error("Code execution failed! Check the console for errors.");
+    } catch (err) {
+      toast.error("Runtime error");
+      setIsRunning(false);
     }
   };
 
   return (
-    // Outer container: Full screen height, dark background
     <div className="h-screen bg-slate-950 flex flex-col text-white">
       <Navbar />
 
       <div className="flex-1 min-h-0 pt-15">
         <PanelGroup direction="horizontal">
-          
-          {/* Left Panel: Problem Description */}
-          <Panel defaultSize={40} minSize={30}>
+          <Panel defaultSize={40}>
             <ProblemDescription
               problem={currentProblem}
               currentProblemId={currentProblemId}
@@ -166,15 +136,11 @@ function ProblemPage() {
             />
           </Panel>
 
-          {/* Horizontal Resize Handle */}
-          <PanelResizeHandle className="w-2 bg-slate-800 hover:bg-blue-600 transition-colors cursor-col-resize border-x border-white/5" />
+          <PanelResizeHandle className="w-2 bg-slate-800" />
 
-          {/* Right Panel: Code Editor & Output */}
-          <Panel defaultSize={60} minSize={30}>
+          <Panel defaultSize={60}>
             <PanelGroup direction="vertical">
-              
-              {/* Top Panel - Code Editor */}
-              <Panel defaultSize={70} minSize={30}>
+              <Panel defaultSize={70}>
                 <CodeEditorPanel
                   selectedLanguage={selectedLanguage}
                   code={code}
@@ -185,18 +151,19 @@ function ProblemPage() {
                 />
               </Panel>
 
-              {/* Vertical Resize Handle */}
-              <PanelResizeHandle className="h-2 bg-slate-800 hover:bg-blue-600 transition-colors cursor-row-resize border-y border-white/5" />
+              <PanelResizeHandle className="h-2 bg-slate-800" />
 
-              {/* Bottom Panel - Output Console */}
-              <Panel defaultSize={30} minSize={20}>
-                <OutputPanel 
-                  output={output} 
+              <Panel defaultSize={30}>
+                <OutputPanel
+                  success={success}
+                  output={output}
                   testCases={currentProblem?.examples}
                   selectedTestCase={selectedTestCase}
                   onSelectTestCase={setSelectedTestCase}
                   testCaseResults={testCaseResults}
-                  expectedOutput={currentProblem?.expectedOutput?.[selectedLanguage]}
+                  expectedOutput={
+                    currentProblem?.expectedOutput?.[selectedLanguage]
+                  }
                 />
               </Panel>
             </PanelGroup>
