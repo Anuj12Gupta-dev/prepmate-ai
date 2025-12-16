@@ -25,6 +25,8 @@ function ProblemPage() {
   const [code, setCode] = useState(PROBLEMS[initialProblemId].starterCode.javascript);
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [selectedTestCase, setSelectedTestCase] = useState(0); // Default to first test case
+  const [testCaseResults, setTestCaseResults] = useState({}); // Store results for each test case
 
   // Derive current problem object
   const currentProblem = PROBLEMS[currentProblemId];
@@ -107,17 +109,41 @@ function ProblemPage() {
     setOutput(result);
     setIsRunning(false);
 
-    if (result.success) {
-      const expectedOutput = currentProblem.expectedOutput[selectedLanguage];
-      const testsPassed = checkIfTestsPassed(result.output, expectedOutput);
-
-      if (testsPassed) {
+    // Process test case results if execution was successful
+    if (result.success && currentProblem.expectedOutput?.[selectedLanguage]) {
+      // Split the expected output by lines
+      const expectedOutputs = currentProblem.expectedOutput[selectedLanguage].split('\n');
+      
+      // Split the actual output by lines
+      const actualOutputs = result.output.split('\n');
+      
+      // Create a copy of current results
+      const updatedResults = { ...testCaseResults };
+      
+      // Process each test case
+      for (let i = 0; i < expectedOutputs.length && i < actualOutputs.length; i++) {
+        const normalizedActual = normalizeOutput(actualOutputs[i]);
+        const normalizedExpected = normalizeOutput(expectedOutputs[i]);
+        
+        updatedResults[i] = {
+          passed: normalizedActual === normalizedExpected,
+          actualOutput: actualOutputs[i].trim(),
+          expectedOutput: expectedOutputs[i].trim()
+        };
+      }
+      
+      setTestCaseResults(updatedResults);
+      
+      // Check overall result
+      const allTestsPassed = Object.values(updatedResults).every(result => result.passed);
+      
+      if (allTestsPassed) {
         triggerConfetti();
         toast.success("All tests passed! Great job!");
       } else {
-        toast.error("Tests failed. Check your output against the examples.");
+        toast.error("Some tests failed. Check your output against the examples.");
       }
-    } else {
+    } else if (!result.success) {
       toast.error("Code execution failed! Check the console for errors.");
     }
   };
@@ -164,7 +190,14 @@ function ProblemPage() {
 
               {/* Bottom Panel - Output Console */}
               <Panel defaultSize={30} minSize={20}>
-                <OutputPanel output={output} />
+                <OutputPanel 
+                  output={output} 
+                  testCases={currentProblem?.examples}
+                  selectedTestCase={selectedTestCase}
+                  onSelectTestCase={setSelectedTestCase}
+                  testCaseResults={testCaseResults}
+                  expectedOutput={currentProblem?.expectedOutput?.[selectedLanguage]}
+                />
               </Panel>
             </PanelGroup>
           </Panel>

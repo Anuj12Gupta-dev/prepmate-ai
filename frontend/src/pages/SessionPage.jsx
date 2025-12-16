@@ -24,6 +24,8 @@ function SessionPage() {
 
   const [output, setOutput] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [selectedTestCase, setSelectedTestCase] = useState(0); // Default to first test case
+  const [testCaseResults, setTestCaseResults] = useState({}); // Store results for each test case
 
   // Data fetching and Mutations
   const { data: sessionData, isLoading: loadingSession, refetch } = useSessionById(id);
@@ -310,7 +312,13 @@ function SessionPage() {
 
               {/* Bottom Panel - Output Panel */}
               <Panel defaultSize={30} minSize={15}>
-                <OutputPanel output={output} />
+                <OutputPanel 
+                  output={output} 
+                  testCases={problemData?.examples}
+                  selectedTestCase={selectedTestCase}
+                  onSelectTestCase={setSelectedTestCase}
+                  testCaseResults={testCaseResults}
+                />
               </Panel>
             </PanelGroup>
           </Panel>
