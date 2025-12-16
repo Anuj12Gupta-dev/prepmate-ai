@@ -1,5 +1,4 @@
 import express from "express";
-import path from "path";
 import cors from "cors";
 import { serve } from "inngest/express";
 
@@ -11,8 +10,6 @@ import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoute.js";
 
 const app = express();
-
-const __dirname = path.resolve();
 
 // Middleware
 app.use(express.json());

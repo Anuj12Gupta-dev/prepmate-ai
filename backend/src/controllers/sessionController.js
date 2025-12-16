@@ -3,7 +3,6 @@ import Session from "../models/Session.js";
 
 export async function createSession(req, res) {
   try {
-    console.log("route hitted ")
     const { problem, difficulty } = req.body;
     const userId = req.user._id;
     const clerkId = req.user.clerkId;
@@ -20,7 +19,7 @@ export async function createSession(req, res) {
 
     // create stream video call
     await streamClient.video.call("default", callId).getOrCreate({
-      data: {
+      data: { 
         created_by_id: clerkId,
         custom: { problem, difficulty, sessionId: session._id.toString() },
       },
