@@ -56,7 +56,7 @@ function DashboardPage() {
           onCreateSession={() => setShowCreateModal(true)} 
         />
 
-        <div className="max-w-7xl mx-auto px-6 pb-16 pt-8">
+        <div className="max-w-7xl mx-auto px-6 pb-16 pt-20">
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             

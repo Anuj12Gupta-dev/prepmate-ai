@@ -47,7 +47,7 @@ function ProblemsPage() {
     <div className="min-h-screen bg-slate-950 text-white">
       <Navbar />
 
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto px-4 pt-20 pb-12">
         
         {/* HEADER */}
         <div className="mb-10">

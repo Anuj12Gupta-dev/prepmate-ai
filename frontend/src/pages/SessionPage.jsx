@@ -157,9 +157,9 @@ function SessionPage() {
     // Outer container: full screen height, flex column
     <div className="h-screen flex flex-col bg-slate-950 text-white"> 
       <Navbar />
-
-      {/* Main Content Area: Calculated height = 100vh - Navbar height (approx 4rem) */}
-      <div className="h-[calc(100vh-4rem)]"> 
+    
+      {/* Main Content Area: Offset for fixed navbar */}
+      <div className="flex-1 pt-16"> 
         <PanelGroup direction="horizontal">
 
           {/* LEFT PANEL: Problem Description & Info */}
@@ -188,7 +188,7 @@ function SessionPage() {
                       {/* Actions */}
                       <div className="flex items-center gap-3 flex-shrink-0">
                         <span
-                          className={`px-3 py-1 text-xs font-semibold rounded-full flex-shrink-0 ${getDifficultyBadgeClass(session?.difficulty)}`}
+                          className={`px-3 py-1 text-sm font-semibold rounded-md flex-shrink-0 capitalize ${getDifficultyBadgeClass(session?.difficulty)}`}
                         >
                           {session?.difficulty}
                         </span>
@@ -196,7 +196,7 @@ function SessionPage() {
                         {session?.status === "active" && (
                           <button
                             onClick={handleShareSession}
-                            className="px-3 py-1 text-sm font-medium rounded-lg bg-slate-700 hover:bg-slate-600 text-white flex items-center gap-2 transition-colors"
+                            className=" px-3 py-1 text-sm font-medium rounded-lg bg-slate-700 hover:bg-slate-600 text-white flex items-center gap-2 transition-colors"
                             title="Copy Session Link"
                           >
                             <ShareIcon className="size-4" />

@@ -127,7 +127,7 @@ function ProblemPage() {
     <div className="h-screen bg-slate-950 flex flex-col text-white">
       <Navbar />
 
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 pt-15">
         <PanelGroup direction="horizontal">
           
           {/* Left Panel: Problem Description */}

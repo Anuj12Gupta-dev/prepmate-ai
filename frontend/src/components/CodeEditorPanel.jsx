@@ -12,7 +12,7 @@ function CodeEditorPanel({
 }) {
   return (
     // Main Editor Panel Container
-    <div className="h-full bg-slate-900 flex flex-col rounded-t-xl border border-white/5">
+    <div className="h-full bg-slate-00 flex flex-col rounded-t-xl border border-white/5">
       
       {/* HEADER / CONTROLS */}
       <div className="flex items-center justify-between px-4 py-3 bg-slate-800 border-b border-white/5 rounded-t-xl flex-shrink-0">
