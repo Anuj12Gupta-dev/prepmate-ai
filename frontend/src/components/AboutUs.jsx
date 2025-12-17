@@ -1,4 +1,4 @@
-    import { Link } from "react-router";
+import { Link } from "react-router";
 import {
   ArrowRightIcon,
   Code2Icon,
@@ -18,18 +18,18 @@ function AboutUsPage() {
   const coreValues = [
     {
       icon: Code2Icon,
-      title: "Excellence in Code",
-      desc: "We strive to build a platform that is robust, fast, and delightful to use.",
+      title: "Learning Over Performance",
+      desc: "We prioritize understanding and consistency over speed or comparison.",
     },
     {
       icon: UsersIcon,
-      title: "Community First",
-      desc: "Our success is measured by the growth and success of developers who use PeerPrep.",
+      title: "Peer Support",
+      desc: "Learning is easier when you are not solving problems alone.",
     },
     {
       icon: HeartHandshakeIcon,
-      title: "Open Collaboration",
-      desc: "A judgment-free environment where engineers practice and grow together.",
+      title: "Judgment-Free Practice",
+      desc: "A safe space where beginners can ask questions and grow together.",
     },
   ];
 
@@ -40,24 +40,24 @@ function AboutUsPage() {
           <section className="text-center max-w-4xl mx-auto space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-400 text-xs font-medium uppercase tracking-wider">
               <TargetIcon className="size-3" />
-              Our Story & Mission
+              Our Mission
             </div>
 
             <h1 className="text-5xl lg:text-6xl font-semibold leading-tight">
-              Empowering developers to{" "}
+              Making coding practice <br />
               <span className="bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
-                Interview with Confidence
+                consistent and collaborative
               </span>
             </h1>
 
             <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-              PeerPrep was founded by engineers to remove stress and inefficiency
-              from coding interview prep.
+              PeerPrep was built to help beginners stay consistent by practicing together,
+              discussing approaches, and learning through peer interaction.
             </p>
 
             <Link to="/dashboard">
               <button className="h-12 px-8 rounded-full bg-blue-600 hover:bg-blue-500 transition flex items-center gap-2 mx-auto">
-                Explore Features
+                Explore Platform
                 <ArrowRightIcon className="size-4" />
               </button>
             </Link>
@@ -67,10 +67,7 @@ function AboutUsPage() {
             <h2 className="text-4xl font-semibold text-center">Our Core Values</h2>
             <div className="grid md:grid-cols-3 gap-6">
               {coreValues.map((value, idx) => (
-                <div
-                  key={idx}
-                  className="p-8 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition"
-                >
+                <div key={idx} className="p-8 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition">
                   <div className="size-12 rounded-lg bg-blue-500/10 flex items-center justify-center mb-6">
                     <value.icon className="size-6 text-blue-400" />
                   </div>
@@ -85,16 +82,9 @@ function AboutUsPage() {
             <h2 className="text-4xl font-semibold text-center">Meet the Team</h2>
             <div className="grid md:grid-cols-4 gap-6">
               {teamMembers.map((member, idx) => (
-                <div
-                  key={idx}
-                  className="p-5 rounded-xl border border-white/5 bg-white/[0.02] text-center"
-                >
+                <div key={idx} className="p-5 rounded-xl border border-white/5 bg-white/[0.02] text-center">
                   <div className="size-20 mx-auto rounded-full overflow-hidden border border-blue-500/50">
-                    <img
-                      src={member.img}
-                      alt={member.name}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={member.img} alt={member.name} className="w-full h-full object-cover" />
                   </div>
                   <h3 className="mt-3 font-semibold">{member.name}</h3>
                   <p className="text-xs text-slate-500">{member.role}</p>
@@ -104,13 +94,13 @@ function AboutUsPage() {
           </section>
 
           <section className="py-20 px-10 rounded-3xl bg-slate-900 border border-white/10 text-center space-y-6">
-            <h2 className="text-4xl font-bold">Ready to start practicing?</h2>
+            <h2 className="text-4xl font-bold">Practice better, together</h2>
             <p className="text-slate-400 max-w-2xl mx-auto">
-              Join thousands of developers preparing smarter with PeerPrep.
+              Join PeerPrep and turn solo problem-solving into a collaborative habit.
             </p>
             <Link to="/signup">
               <button className="h-14 px-10 rounded-full bg-blue-600 hover:bg-blue-500 transition flex items-center gap-2 mx-auto">
-                Get Started for Free
+                Get Started
                 <ArrowRightIcon className="size-5" />
               </button>
             </Link>
