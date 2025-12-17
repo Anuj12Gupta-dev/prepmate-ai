@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Code2Icon, LoaderIcon, PlusIcon, SearchIcon, FilterIcon } from "lucide-react";
+import { Code2Icon, LoaderIcon, PlusIcon, SearchIcon, FilterIcon, LockIcon } from "lucide-react";
 import { PROBLEMS } from "../data/problems";
 
 function CreateSessionModal({
@@ -9,6 +9,7 @@ function CreateSessionModal({
   setRoomConfig,
   onCreateRoom,
   isCreating,
+  onSetPassword,
 }) {
   const allProblems = Object.values(PROBLEMS);
   
@@ -139,6 +140,12 @@ function CreateSessionModal({
                   <p className="text-sm text-slate-300">
                     Max Participants: <span className="font-medium text-white">2 (1-on-1 session)</span>
                   </p>
+                  {roomConfig.password && (
+                    <p className="text-sm text-slate-300 mt-2 flex items-center gap-1">
+                      <LockIcon className="size-4 text-blue-400" />
+                      <span>Password Protected</span>
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -146,23 +153,45 @@ function CreateSessionModal({
         </div>
 
         {/* Modal Actions */}
-        <div className="flex justify-end gap-3 p-4 border-t border-white/5">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 p-4 border-t border-white/5">
           <button className="h-10 px-5 rounded-full text-slate-400 hover:bg-white/5 transition-colors" onClick={onClose}>
             Cancel
           </button>
-
-          <button
-            className="h-10 px-6 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={onCreateRoom}
-            disabled={isCreating || !roomConfig.problem}
-          >
-            {isCreating ? (
-              <LoaderIcon className="size-5 animate-spin" />
+          
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            {!roomConfig.password ? (
+              <button
+                type="button"
+                className="h-10 px-4 rounded-full bg-slate-700 hover:bg-slate-600 text-white font-medium transition-colors flex items-center justify-center gap-2"
+                onClick={onSetPassword}
+              >
+                <LockIcon className="size-4" />
+                Add Password
+              </button>
             ) : (
-              <PlusIcon className="size-5" />
+              <button
+                type="button"
+                className="h-10 px-4 rounded-full bg-slate-700 hover:bg-slate-600 text-white font-medium transition-colors flex items-center justify-center gap-2"
+                onClick={() => setRoomConfig(prev => ({ ...prev, password: null }))}
+              >
+                <LockIcon className="size-4" />
+                Remove Password
+              </button>
             )}
-            {isCreating ? "Creating..." : "Create Session"}
-          </button>
+            
+            <button
+              className="h-10 px-6 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={onCreateRoom}
+              disabled={isCreating || !roomConfig.problem}
+            >
+              {isCreating ? (
+                <LoaderIcon className="size-5 animate-spin" />
+              ) : (
+                <PlusIcon className="size-5" />
+              )}
+              {isCreating ? "Creating..." : "Create Session"}
+            </button>
+          </div>
         </div>
       </div>
       

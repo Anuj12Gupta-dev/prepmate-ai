@@ -9,11 +9,13 @@ import StatsCards from "../components/StatsCards";
 import ActiveSessions from "../components/ActiveSessions";
 import RecentSessions from "../components/RecentSessions";
 import CreateSessionModal from "../components/CreateSessionModal";
+import PasswordModal from "../components/PasswordModal";
 
 function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useUser();
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [roomConfig, setRoomConfig] = useState({ problem: "", difficulty: "" });
 
   const createSessionMutation = useCreateSession();
@@ -24,18 +26,37 @@ function DashboardPage() {
   const handleCreateRoom = () => {
     if (!roomConfig.problem || !roomConfig.difficulty) return;
 
+    const sessionData = {
+      problem: roomConfig.problem,
+      difficulty: roomConfig.difficulty.toLowerCase(),
+    };
+    
+    // Add password if it exists
+    if (roomConfig.password) {
+      sessionData.password = roomConfig.password;
+    }
+
     createSessionMutation.mutate(
-      {
-        problem: roomConfig.problem,
-        difficulty: roomConfig.difficulty.toLowerCase(),
-      },
+      sessionData,
       {
         onSuccess: (data) => {
           setShowCreateModal(false);
+          setRoomConfig({ problem: "", difficulty: "" });
           navigate(`/session/${data.session._id}`);
         },
       }
     );
+  };
+
+  const handleSetPassword = () => {
+    setShowCreateModal(false);
+    setShowPasswordModal(true);
+  };
+
+  const handlePasswordSubmit = (password) => {
+    setRoomConfig(prev => ({ ...prev, password }));
+    setShowPasswordModal(false);
+    setShowCreateModal(true);
   };
 
   const activeSessions = activeSessionsData?.sessions || [];
@@ -92,6 +113,17 @@ function DashboardPage() {
         roomConfig={roomConfig}
         setRoomConfig={setRoomConfig}
         onCreateRoom={handleCreateRoom}
+        onSetPassword={handleSetPassword}
+        isCreating={createSessionMutation.isPending}
+      />
+      
+      <PasswordModal
+        isOpen={showPasswordModal}
+        onClose={() => {
+          setShowPasswordModal(false);
+          setShowCreateModal(true);
+        }}
+        onSubmit={handlePasswordSubmit}
         isCreating={createSessionMutation.isPending}
       />
     </>

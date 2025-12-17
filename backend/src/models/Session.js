@@ -31,6 +31,11 @@ const sessionSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    // password protection
+    password: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );
