@@ -17,6 +17,7 @@ import { StreamCall, StreamVideo } from "@stream-io/video-react-sdk";
 import VideoCallUI from "../components/VideoCallUI";
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
+import { useIsMdUp } from "../hooks/useIsMdUp";
 
 function SessionPage() {
   const navigate = useNavigate();
@@ -214,7 +215,16 @@ function SessionPage() {
     );
   }
 
-  // --- Rendering UI ---
+  const isMdUp = useIsMdUp();
+  
+    useEffect(() => {
+      if (!isMdUp) {
+        toast(
+          "For better experience, please use a larger screen size.",
+          { id: "screen-warning" }
+        );
+      }
+    }, [isMdUp]);
 
   return (
     // Outer container: full screen height, flex column
@@ -223,7 +233,7 @@ function SessionPage() {
     
       {/* Main Content Area: Offset for fixed navbar */}
       <div className="flex-1 pt-16"> 
-        <PanelGroup direction="horizontal">
+        <PanelGroup direction={isMdUp ? "horizontal" : "vertical"}>
 
           {/* LEFT PANEL: Problem Description & Info */}
           <Panel defaultSize={50} minSize={30}>

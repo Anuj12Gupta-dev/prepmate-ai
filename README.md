@@ -25,7 +25,7 @@ PeerPrep is a collaborative coding interview preparation platform that allows us
 
 ## Overview
 
-PrepMate AI is designed to help software engineers prepare for technical interviews by providing a collaborative environment where they can practice coding problems with peers. The platform combines real-time video chat, shared code editing, and instant code execution to simulate a realistic interview setting.
+PeerPrep AI is designed to help software engineers prepare for technical interviews by providing a collaborative environment where they can practice coding problems with peers. The platform combines real-time video chat, shared code editing, and instant code execution to simulate a realistic interview setting.
 
 ## Features
 
@@ -86,7 +86,7 @@ PrepMate AI is designed to help software engineers prepare for technical intervi
 ## Project Structure
 
 ```
-prepmate-ai/
+PeerPrep-ai/
 ├── backend/
 │   ├── src/
 │   │   ├── controllers/     # Request handlers
@@ -161,8 +161,8 @@ Before you begin, ensure you have the following installed:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/prepmate-ai.git
-cd prepmate-ai
+git clone https://github.com/your-username/PeerPrep-ai.git
+cd PeerPrep-ai
 ```
 
 2. Install backend dependencies:

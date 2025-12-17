@@ -11,6 +11,7 @@ import { executeCode } from "../lib/piston";
 
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
+import { useIsMdUp } from "../hooks/useIsMdUp";
 
 function ProblemPage() {
   const { id } = useParams();
@@ -122,12 +123,26 @@ function ProblemPage() {
     }
   };
 
+  const isMdUp = useIsMdUp();
+
+  useEffect(() => {
+    if (!isMdUp) {
+      toast(
+        "For better experience, please use a larger screen size.",
+        { id: "screen-warning" }
+      );
+    }
+  }, [isMdUp]);
+
+
+
+
   return (
     <div className="h-screen bg-slate-950 flex flex-col text-white">
       <Navbar />
 
       <div className="flex-1 min-h-0 pt-15">
-        <PanelGroup direction="horizontal">
+        <PanelGroup direction={isMdUp ? "horizontal" : "vertical"}>
           <Panel defaultSize={40}>
             <ProblemDescription
               problem={currentProblem}
