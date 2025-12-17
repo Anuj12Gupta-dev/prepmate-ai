@@ -1,352 +1,231 @@
-# PeerPrep - Coding Interview Preparation Platform
+# PeerPrep
 
-PeerPrep is a collaborative coding interview preparation platform that allows users to practice coding problems together in real-time with video chat, code sharing, and execution capabilities.
+PeerPrep is a collaborative coding platform that combines LeetCode-style problem solving with real-time video conferencing, chat, and code sharing capabilities. It enables developers to practice coding interviews together in a shared environment with Google Meet-like collaboration features.
 
-## Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Technology Stack](#technology-stack)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Environment Variables](#environment-variables)
-  - [Running the Application](#running-the-application)
-- [Usage Guide](#usage-guide)
-- [API Endpoints](#api-endpoints)
-- [Database Schema](#database-schema)
-- [Authentication Flow](#authentication-flow)
-- [Real-time Communication](#real-time-communication)
-- [Code Execution](#code-execation)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-- [License](#license)
+## Key Features
 
-## Overview
+- LeetCode-style problem solving interface
+- Real-time collaborative coding sessions (limited to 2 users per session)
+- Public sessions (anyone can join)
+- Private sessions (password protected)
+- Video calling between participants
+- Real-time chat
+- Screen sharing
+- Live reactions on shared screen
+- Session creation, joining, and ending logic
+- Secure access for private sessions
 
-PeerPrep AI is designed to help software engineers prepare for technical interviews by providing a collaborative environment where they can practice coding problems with peers. The platform combines real-time video chat, shared code editing, and instant code execution to simulate a realistic interview setting.
-
-## Features
-
-### Core Features
-- **Real-time Video Chat**: Connect with peers for face-to-face interview practice
-- **Collaborative Code Editor**: Write and edit code together in real-time with syntax highlighting
-- **Multi-language Support**: Practice in various programming languages (JavaScript, Python, Java, etc.)
-- **Instant Code Execution**: Run your code and see results instantly without leaving the platform
-- **Coding Problem Library**: Access a curated collection of common interview problems
-- **Session Management**: Create, join, and manage practice sessions
-- **User Authentication**: Secure sign-up and login using Clerk authentication
-
-### Additional Features
-- **Problem Difficulty Levels**: Problems categorized by difficulty (Easy, Medium, Hard)
-- **Session History**: Track your past practice sessions
-- **Active Sessions Discovery**: Browse and join ongoing sessions hosted by others
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
-
-## Technology Stack
+## Tech Stack
 
 ### Frontend
-- **React 19+** - JavaScript library for building user interfaces
-- **Vite 7+** - Fast build tool and development server
-- **Tailwind CSS 4+** - Utility-first CSS framework
-- **DaisyUI 5+** - Component library for Tailwind CSS
-- **React Router v7** - Declarative routing for React applications
-- **React Query (TanStack Query) 5+** - Data fetching and state management
-- **Monaco Editor** - Code editor component (same as VS Code)
-- **Stream Chat & Video SDK** - Real-time communication APIs
-- **Clerk** - Authentication and user management
-- **Axios** - HTTP client for API requests
+
+- React 18 with Vite
+- Monaco Editor for code editing
+- TailwindCSS with DaisyUI for styling
+- Stream Video SDK for video calling
+- Stream Chat SDK for real-time messaging
+- Clerk for authentication
+- TanStack Query for data fetching
+- React Router for navigation
+- Axios for HTTP requests
 
 ### Backend
-- **Node.js** - JavaScript runtime environment
-- **Express.js v5** - Web application framework
-- **MongoDB with Mongoose** - NoSQL database and ODM
-- **Inngest** - Event-driven background job processing
-- **Stream Chat & Video API** - Real-time communication infrastructure
-- **Clerk Express Middleware** - Authentication middleware
 
-## Architecture
+- Node.js with Express.js
+- MongoDB with Mongoose for data persistence
+- Stream Chat Node SDK for chat functionality
+- Stream Video Node SDK for video calling
+- Clerk Express for authentication
+- Inngest for webhook processing
+- Mongoose for MongoDB object modeling
+
+### Realtime / Video / Streaming
+
+- Stream Chat for real-time messaging
+- Stream Video for WebRTC-based video calling
+- WebSockets for real-time collaboration features
+
+## System Architecture
+
+PeerPrep follows a client-server architecture with real-time communication capabilities:
+
+1. **Frontend Client**: React-based single-page application that handles user interactions, code editing, and real-time UI updates.
+2. **Backend API**: Express.js server that manages RESTful API endpoints, database operations, and integration with third-party services.
+3. **Real-time Services**: Stream's Video and Chat SDKs handle WebRTC connections for video calling and WebSocket connections for messaging.
+4. **Database**: MongoDB stores user information, session metadata, and problem data.
+5. **Authentication**: Clerk handles user authentication and provides JWT tokens for secure API access.
+6. **Webhooks**: Inngest processes asynchronous events from Clerk for user lifecycle management.
+
+The frontend communicates with the backend through REST APIs and connects directly to Stream's services for real-time features.
+
+## Folder Structure
+
+### Frontend
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Frontend      │    │    Backend       │    │   Services      │
-│   (React)       │    │   (Node/Express) │    │                 │
-├─────────────────┤    ├──────────────────┤    ├─────────────────┤
-│                 │    │                  │    │                 │
-│  React Router   │    │   Controllers    │    │   MongoDB       │
-│  React Query    │◄──►│   Middleware     │◄──►│   (Sessions)    │
-│  Monaco Editor  │    │   Routes         │    │                 │
-│  Stream SDK     │    │   Models         │    │   Stream API    │
-│  Clerk Auth     │    │   Lib (Utils)    │    │   (Chat/Video)  │
-│                 │    │                  │    │                 │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+frontend/
+├── src/
+│   ├── api/           # API clients and request handlers
+│   ├── components/    # Reusable UI components
+│   ├── data/          # Static data like problems and language configs
+│   ├── hooks/         # Custom React hooks
+│   ├── lib/           # Utility functions and service integrations
+│   ├── pages/         # Page components for routing
+│   ├── App.jsx        # Main application component
+│   ├── index.css      # Global styles
+│   └── main.jsx       # Entry point
+├── index.html         # HTML template
+├── vite.config.js     # Vite configuration
+└── package.json       # Dependencies and scripts
 ```
 
-## Project Structure
+### Backend
 
 ```
-PeerPrep-ai/
-├── backend/
-│   ├── src/
-│   │   ├── controllers/     # Request handlers
-│   │   │   ├── chatController.js
-│   │   │   └── sessionController.js
-│   │   ├── lib/             # Utilities and configurations
-│   │   │   ├── db.js
-│   │   │   ├── env.js
-│   │   │   ├── inngest.js
-│   │   │   └── stream.js
-│   │   ├── middleware/      # Custom middleware functions
-│   │   │   └── protectRoute.js
-│   │   ├── models/          # Database models
-│   │   │   ├── Session.js
-│   │   │   └── User.js
-│   │   ├── routes/          # API route definitions
-│   │   │   ├── chatRoutes.js
-│   │   │   └── sessionRoute.js
-│   │   └── server.js        # Main server entry point
-│   ├── .env                 # Backend environment variables
-│   └── package.json         # Backend dependencies
-└── frontend/
-    ├── src/
-    │   ├── api/             # API service functions
-    │   │   └── sessions.js
-    │   ├── components/      # Reusable UI components
-    │   │   ├── ActiveSessions.jsx
-    │   │   ├── CodeEditorPanel.jsx
-    │   │   ├── CreateSessionModal.jsx
-    │   │   ├── Navbar.jsx
-    │   │   ├── OutputPanel.jsx
-    │   │   ├── ProblemDescription.jsx
-    │   │   ├── RecentSessions.jsx
-    │   │   ├── StatsCards.jsx
-    │   │   ├── VideoCallUI.jsx
-    │   │   └── WelcomeSection.jsx
-    │   ├── data/            # Static data files
-    │   │   └── problems.js
-    │   ├── hooks/           # Custom React hooks
-    │   │   ├── useSessions.js
-    │   │   └── useStreamClient.js
-    │   ├── lib/             # Utility functions
-    │   │   ├── axios.js
-    │   │   ├── piston.js
-    │   │   ├── stream.js
-    │   │   └── utils.js
-    │   ├── pages/           # Page components
-    │   │   ├── DashboardPage.jsx
-    │   │   ├── HomePage.jsx
-    │   │   ├── ProblemPage.jsx
-    │   │   ├── ProblemsPage.jsx
-    │   │   └── SessionPage.jsx
-    │   ├── App.jsx          # Main App component
-    │   └── main.jsx         # React DOM renderer
-    ├── .env                 # Frontend environment variables
-    └── package.json         # Frontend dependencies
+backend/
+├── src/
+│   ├── controllers/   # Request handlers for routes
+│   ├── lib/           # Utility functions and service integrations
+│   ├── middleware/    # Express middleware functions
+│   ├── models/        # Mongoose data models
+│   ├── routes/        # API route definitions
+│   └── server.js      # Server entry point
+├── .env               # Environment variables
+└── package.json       # Dependencies and scripts
 ```
 
-## Getting Started
+## Environment Variables
 
-### Prerequisites
+### Frontend .env
 
-Before you begin, ensure you have the following installed:
-- Node.js (v18 or higher)
-- npm or yarn package manager
-- MongoDB database (local or cloud instance)
-- Accounts for third-party services:
-  - Clerk (Authentication)
-  - Stream Chat & Video (Communication APIs)
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/your-username/PeerPrep-ai.git
-cd PeerPrep-ai
+```env
+VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+VITE_API_URL=http://localhost:5000/api
+VITE_STREAM_API_KEY=your_stream_api_key
 ```
 
-2. Install backend dependencies:
-```bash
-cd backend
-npm install
-```
+### Backend .env
 
-3. Install frontend dependencies:
-```bash
-cd ../frontend
-npm install
-```
-
-### Environment Variables
-
-#### Backend (.env)
-Create a `.env` file in the `backend/` directory with the following variables:
 ```env
 PORT=5000
 NODE_ENV=development
-CLIENT_URL=http://localhost:5173
-MONGO_URL=your_mongodb_connection_string
-CLERK_SECRET_KEY=your_clerk_secret_key
+DB_URL=your_mongodb_connection_string
+INNGEST_EVENT_KEY=your_inngest_event_key
+INNGEST_SIGNING_KEY=your_inngest_signing_key
 STREAM_API_KEY=your_stream_api_key
 STREAM_API_SECRET=your_stream_api_secret
-INNGEST_SIGNING_KEY=your_inngest_signing_key
-INNGEST_EVENT_KEY=your_inngest_event_key
+CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+CLIENT_URL=http://localhost:5173
 ```
 
-#### Frontend (.env)
-Create a `.env` file in the `frontend/` directory with the following variables:
-```env
-VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-VITE_STREAM_API_KEY=your_stream_api_key
-VITE_BACKEND_URL=http://localhost:5000
-```
+## Installation & Setup
 
-### Running the Application
+### Frontend setup
 
-1. Start the backend server:
-```bash
-cd backend
-npm run dev
-```
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
 
-2. Start the frontend development server:
-```bash
-cd frontend
-npm run dev
-```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-3. Open your browser and navigate to `http://localhost:5173`
+3. Create a `.env` file based on the example above
 
-## Usage Guide
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-### Creating an Account
-1. Visit the homepage and click "Sign Up"
-2. Complete the registration process using email or social login
-3. Verify your email if required
+### Backend setup
 
-### Starting a Practice Session
-1. After logging in, you'll be redirected to the dashboard
-2. Click "Create Session" to start a new practice session
-3. Select a coding problem and difficulty level
-4. Share the session link with a peer or wait for someone to join
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
 
-### Joining a Session
-1. From the dashboard, browse active sessions
-2. Click "Join" on any available session
-3. You'll be redirected to the session page
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-### Using the Collaborative Editor
-1. The left panel displays the problem description and examples
-2. The middle panel contains the code editor:
-   - Select your preferred programming language
-   - Write and edit code collaboratively
-   - Click "Run Code" to execute your solution
-3. The bottom panel shows the output of your code execution
+3. Create a `.env` file based on the example above
 
-### Video Chat
-1. The right panel displays the video chat interface
-2. Camera and microphone permissions will be requested
-3. Built-in chat functionality for text communication
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-## API Endpoints
+## Running the Application Locally
 
-### Session Management
-- `POST /api/sessions` - Create a new session
-- `GET /api/sessions/active` - Get all active sessions
-- `GET /api/sessions/my-recent` - Get user's recent sessions
-- `GET /api/sessions/:id` - Get session by ID
-- `POST /api/sessions/:id/join` - Join a session
-- `POST /api/sessions/:id/end` - End a session
+1. Ensure both frontend and backend servers are running
+2. Access the application at `http://localhost:5173` (default Vite development server port)
+3. Register or sign in using Clerk authentication
+4. Create or join a coding session to begin collaborating
+
+## How Sessions Work
+
+### Public sessions
+
+Public sessions are visible to all users on the platform. Any user can join a public session as long as there is space (sessions are limited to 2 participants). When creating a public session, no password is required, making it instantly accessible.
+
+### Private (password-protected) sessions
+
+Private sessions require a password to join. When creating a private session, the host sets a password that participants must enter to gain access. These sessions are not listed in the public session directory, providing a more exclusive collaboration environment.
+
+## Real-Time Communication Flow
+
+### Video
+
+1. When a session is created, a unique Stream Video call ID is generated
+2. Participants join the call using the session's call ID
+3. Stream's WebRTC infrastructure handles peer-to-peer video connections
+4. Video streams are managed through Stream's video SDK components
 
 ### Chat
-- `GET /api/chat/token` - Get Stream Chat token
 
-### Health Check
-- `GET /` - Check if the API is running
+1. Each session has an associated Stream Chat channel
+2. When participants join a session, they are added to the channel
+3. Messages are sent and received through WebSocket connections
+4. Chat history is persisted by Stream's chat service
 
-## Database Schema
+### Screen sharing
 
-### User Model
-```javascript
-{
-  name: String,          // Required
-  email: String,         // Required, Unique
-  profileImage: String,  // Optional
-  clerkId: String        // Required, Unique
-}
-```
+1. Screen sharing is built into Stream's video SDK
+2. Participants can share their entire screen or specific applications
+3. Shared content is transmitted through WebRTC data channels
+4. Other participants can view the shared screen in real-time
 
-### Session Model
-```javascript
-{
-  problem: String,               // Required
-  difficulty: String,            // Enum: ["easy", "medium", "hard"]
-  host: ObjectId (ref: User),    // Required
-  participant: ObjectId (ref: User), // Optional
-  status: String,                // Enum: ["active", "completed"], Default: "active"
-  callId: String                 // Stream video call ID
-}
-```
+### Reactions
 
-## Authentication Flow
+1. Reactions are implemented as real-time events within the video session
+2. When a user sends a reaction, it's broadcast to all session participants
+3. The frontend displays animations or visual indicators for reactions
+4. Reactions are ephemeral and don't persist beyond the session
 
-PeerPrep uses Clerk for authentication:
-1. Users sign up/log in through Clerk's authentication system
-2. Clerk provides a JWT token to the frontend
-3. The frontend includes this token in the Authorization header for all API requests
-4. The backend verifies the token using Clerk's verification middleware
-5. If valid, the request proceeds; otherwise, a 401 Unauthorized response is sent
+## Security Considerations
 
-## Real-time Communication
+- Authentication is handled by Clerk, providing secure JWT-based authentication
+- All API requests require valid authentication tokens
+- Password-protected sessions ensure only authorized users can join
+- Stream's services handle encryption for video and chat communications
+- Database connections are secured through MongoDB's authentication mechanisms
+- Environment variables are used to keep sensitive keys out of the codebase
 
-The platform uses Stream's Chat and Video SDKs for real-time communication:
-- **Video Calls**: Implemented using Stream Video SDK for peer-to-peer video communication
-- **Text Chat**: Implemented using Stream Chat SDK for messaging within sessions
-- **Session Synchronization**: Real-time updates for session status and participant information
+## Future Improvements
 
-## Code Execution
-
-The platform supports code execution through integration with the Piston API:
-- Multiple programming languages supported
-- Secure code execution in isolated environments
-- Real-time output streaming
-- Error handling and timeout management
-
-## Deployment
-
-### Backend Deployment
-1. Set up a MongoDB database (MongoDB Atlas recommended)
-2. Deploy the Express server to a cloud provider (Vercel, Render, Heroku, etc.)
-3. Configure environment variables in your deployment platform
-
-### Frontend Deployment
-1. Build the production version:
-```bash
-cd frontend
-npm run build
-```
-2. Deploy the contents of the `dist/` folder to a static hosting service (Vercel, Netlify, etc.)
-
-### Environment Configuration for Production
-Ensure all environment variables are properly configured in your production environment, especially:
-- `CLIENT_URL` should point to your frontend URL
-- `MONGO_URI` should point to your production MongoDB instance
-- All Clerk and Stream API keys should be production keys
-
-## Contributing
-
-We welcome contributions to PeerPrep! Here's how you can help:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-Please ensure your code follows the existing style and includes appropriate tests.
+- Implement code execution environments for multiple languages
+- Add session recording capabilities for video and code collaboration
+- Introduce problem-solving analytics and progress tracking
+- Enhance mobile responsiveness for better cross-device support
+- Add support for larger group sessions
+- Implement automated session matching based on skill levels
+- Add integrated whiteboarding capabilities
+- Introduce AI-powered code review and suggestions
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
+This project is licensed under the MIT License.
