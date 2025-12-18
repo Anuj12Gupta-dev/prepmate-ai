@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import {
   ArrowRightIcon,
@@ -9,11 +10,22 @@ import {
   UsersIcon,
   VideoIcon,
   ZapIcon,
+  XIcon,
 } from "lucide-react";
 import { SignInButton } from "@clerk/clerk-react";
 import AboutUsPage from "../components/AboutUs";
 
 function HomePage() {
+  const [showDemo, setShowDemo] = useState(false);
+
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") setShowDemo(false);
+    };
+    if (showDemo) document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [showDemo]);
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-blue-500/30 flex flex-col">
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-slate-950/80 backdrop-blur-xl">
@@ -69,7 +81,10 @@ function HomePage() {
                   </button>
                 </SignInButton>
 
-                <button className="h-12 px-8 rounded-full border border-white/10 hover:border-white/20 hover:bg-white/5 font-medium transition-all flex items-center gap-2">
+                <button
+                  onClick={() => setShowDemo(true)}
+                  className="h-12 px-8 rounded-full border border-white/10 hover:border-white/20 hover:bg-white/5 font-medium transition-all flex items-center gap-2"
+                >
                   <VideoIcon className="size-4 text-slate-400" />
                   Watch Demo
                 </button>
@@ -150,6 +165,32 @@ function HomePage() {
           </div>
         </div>
       </footer>
+
+      {showDemo && (
+        <div
+          onClick={() => setShowDemo(false)}
+          className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm flex items-center justify-center"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-4xl mx-4 scale-100 animate-in fade-in zoom-in duration-200"
+          >
+            <button
+              onClick={() => setShowDemo(false)}
+              className="absolute -top-10 right-0 text-white opacity-70 hover:opacity-100"
+            >
+              <XIcon className="size-5" />
+            </button>
+
+            <video
+              src="/PeerPrepDemo.mp4"
+              controls
+              autoPlay
+              className="w-full rounded-xl border border-white/10 bg-black"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
